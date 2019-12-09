@@ -1,0 +1,56 @@
+.table_block{
+	position: relative;
+	top: 59px;
+	left: 10%;
+	border-radius: 8px;
+    box-shadow: -2px -2px rgba(10,21,28,.9) inset;
+	padding: 10px 10px;
+	width: 80%;
+	min-width: 1000px;
+    background: #AFCDE7;
+	overflow: auto;
+}
+
+table {
+	border-collapse: collapse;
+	text-align: center;
+	font: 11px Lucida Sans Unicode, Lucida Grande, Helvetica, sans-serif;
+	width: 100%;
+}
+.order_button{
+	background-color: transparent;
+	color: #FFF5EE;
+	text-shadow: -1px -1px 8px black;
+	font-size: 11px;
+	border-width: 0;	
+}
+.order_button:hover{
+	color: #800000;
+	text-shadow: -1px -1px 8px white;
+}
+
+.order_button:active{
+	color: red;
+	text-shadow: -1px -1px 8px black;
+}
+
+th{
+	color: white;
+	padding: 5px 5px;
+	width: 20px;
+}
+
+th, td {
+	border-style: solid;
+	border-width: 0 1px 1px 0;
+	border-color: white;
+}
+
+tr:hover td {
+	background: #e8edff;
+}
+
+td {
+	background: #D8E6F3;
+}
+

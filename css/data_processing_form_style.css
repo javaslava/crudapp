@@ -1,0 +1,70 @@
+.data_processing_block {
+	background: #AFCDE7;
+	height: 250px;
+	width: 80%;
+	min-width: 1000px;
+    position: relative;
+    top: 55px;
+	left: 10%;
+    overflow: hidden;
+	padding: 10px 10px;
+	border-radius: 8px;
+    box-shadow: -2px -2px rgba(10,21,28,.9) inset;
+	line-height: 8px;
+
+}
+
+#auto_data_legend, #owner_data_legend {
+	line-height: 1.8;
+	width: 45%;
+}
+
+#auto_data_legend {
+	float: left;
+}
+
+#owner_data_legend {
+	float: right;
+}
+
+#buttons, #total_records{
+	position: absolute;
+	bottom: 15px;
+}
+
+#buttons{
+	right: 50px;
+}
+
+#total_records{
+	left: 50px;
+}
+
+#page_counter{
+	position: absolute;
+	left: 180px;
+	bottom: 12px;
+	max-width: 420px;
+	overflow-x: auto;
+	background: transparent;
+}
+
+#page_button_block{
+	float: left;
+	width: 30px;
+}
+#page_button{
+	width: 34px;
+	text-align: center;
+	font-size: 8px;
+}
+
+.data_processing_message{
+	float: clear;
+	position: absolute;
+	bottom: 80px;
+	right: 30px;
+	width: 450px;
+	font-size: 14px;
+	color: #B22222;
+}
