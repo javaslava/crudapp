@@ -7,16 +7,18 @@ class Model_LogRegAnalyzer{
 	private $confirm_pass;
 	private $log_email;
 	private $log_password;
-	
-	function __construct($db_conn, $reg_userName, $reg_email, $reg_password, $confirm_pass, $log_email, $log_password){
+	private $userID;
+	private $userName;
+
+	function __construct($db_conn, $user_data){
 		
 		$this -> DB = $db_conn;
-		$this -> reg_userName = $reg_userName;
-		$this -> reg_email = $reg_email;
-		$this -> reg_password = $reg_password;
-		$this -> confirm_pass = $confirm_pass;
-		$this -> log_email = $log_email;
-		$this -> log_password = $log_password;
+		$this -> reg_userName = $user_data['reg_userName'];
+		$this -> reg_email = $user_data['reg_email'];
+		$this -> reg_password = $user_data['reg_password'];
+		$this -> confirm_pass = $user_data['confirm_pass'];
+		$this -> log_email = $user_data['log_email'];
+		$this -> log_password = $user_data['log_password'];
 	}
 	
 	public function get_message(){
@@ -89,9 +91,8 @@ class Model_LogRegAnalyzer{
 					return 'Password is not correct. Try again.';
 				}
 				else
-				{
-					$_SESSION['user']['userID'] = $checkedRow['user_id'];
-					$_SESSION['user']['userName'] = $checkedRow['user_name'];
+				{	$this -> userID = $checkedRow['user_id'];
+					$this -> userName = $checkedRow['user_name'];
 					return '';
 				}	
 			}
@@ -102,8 +103,7 @@ class Model_LogRegAnalyzer{
 	}
 	else
 	{
-		return 'To register new user press "Register" button and fill all fields. </br> 
-				To Log In fill your e-mail and password.';
+		return 'To register new user press "Register" button and fill all fields. </br>To Log In fill your e-mail and password.';
 	}		
 }
 
@@ -114,5 +114,13 @@ class Model_LogRegAnalyzer{
 			echo("запрос не даёт результата\n");}
 		$result->close();
 		$connection->close();
+	}
+	
+	public function get_userID(){
+		return $this -> userID;
+	}
+	
+	public function get_userName(){
+		return $this -> userName;
 	}
 }

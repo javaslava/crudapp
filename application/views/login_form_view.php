@@ -37,11 +37,13 @@
 		<p><button class="button_set" type="reset">Reset</button>
 		<input class="button_set" type="submit" value="Send" name="data_submit">
 		<input class="button_set" type="button" onclick="history.back();" value="Back"/>
-		<input class="button_set" type="button" name="cancel" value="Cancel" onClick="window.location='<?php SITE_PATH ?>';" /></p>
+		<input class="button_set" type="submit" name="cancel" value="Cancel">    
+		</p>     
 		<?php
-		if (isset($_SESSION['login_message']) && $_SESSION['login_message'])
+		
+	if (isset($data['login_message']) && $data['login_message'])
     {
-      printf('<div class="message">%s</div>', $_SESSION['login_message']);
+      printf('<div class="message">%s</div>', $data['login_message']);
     }
 		?>
 		</form>

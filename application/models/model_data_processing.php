@@ -1,23 +1,21 @@
 <?php
 class Model_Data_Processing extends Model{
 	
+	private $_PIE = array();
 	private $records_amount;
+	private $filter_query;
 	private $data_request;
 	private $search_result = array();
-	private $limit_rule;
-	private $general_sql = "SELECT vin_nr, reg_nr, manufact_year, brand_name, model_name, owner_name, owner_surname, owner_number
-							FROM auto_data, owner_data 
-							WHERE auto_data.owner_id = owner_data.owner_id";
-							
-	public function set_limit_rules(){
-		$skip = ($_SESSION['page_number'] - 1) * RECORDS_PER_PAGE;
-		$this -> limit_rule = " LIMIT ".$skip.", ".RECORDS_PER_PAGE;
+	private $general_sql = "SELECT vin_nr, reg_nr, manufact_year, brand_name, model_name, owner_name, owner_surname, owner_number FROM auto_data, owner_data WHERE auto_data.owner_id = owner_data.owner_id";
+
+	public function set_PIE($pie_array){
+		$this -> _PIE = $pie_array;
 	}
 
 	public function set_searchResult(){
 		
-		$this -> data_request = !empty($_SESSION['filter_data']['filter_query']) ? $_SESSION['filter_data']['filter_query'] : $this -> general_sql;
-		$data_output_sql = $this -> data_request.$_SESSION['order_rule'].$this -> limit_rule;
+		$this -> data_request = !empty($this -> filter_query) ? $this -> filter_query : (isset($this -> _PIE['filter_query']) ? $this -> _PIE['filter_query'] : $this -> general_sql);
+		$data_output_sql = $this -> data_request.$this -> _PIE['order_rule'].$this -> _PIE['limit_rule'];
 		$this -> search_result = parent::get_sql_array_result($data_output_sql);
 	}
 		
@@ -30,33 +28,35 @@ class Model_Data_Processing extends Model{
 		}
 		return $pages_array;
 	}
+	
 	public function get_total_records(){
 		return $this -> records_amount;
 	}	
+	
 			
 	public function get_insert_action(){
 		
-		if(!empty($_SESSION['auto_data']['vin_nr']) && 
-			!empty($_SESSION['auto_data']['reg_nr']) && 
-			!empty($_SESSION['auto_data']['manufact_year']) && 
-			!empty($_SESSION['auto_data']['model_name']) && 
-			!empty($_SESSION['auto_data']['brand_name']) &&
-			!empty($_SESSION['owner_data']['owner_name']) &&
-			!empty($_SESSION['owner_data']['owner_surname']) &&
-			!empty($_SESSION['owner_data']['owner_number']))	
+		if(isset($this -> _PIE['vin_nr']) && 
+			isset($this -> _PIE['reg_nr']) && 
+			isset($this -> _PIE['manufact_year']) && 
+			isset($this -> _PIE['model_name']) && 
+			isset($this -> _PIE['brand_name']) &&
+			isset($this -> _PIE['owner_name']) &&
+			isset($this -> _PIE['owner_surname']) &&
+			isset($this -> _PIE['owner_number']))	
 		{
-			$check_vin_sql = "SELECT auto_id FROM auto_data WHERE vin_nr='{$_SESSION['auto_data']['vin_nr']}'";
+			$check_vin_sql = "SELECT auto_id FROM auto_data WHERE vin_nr='".$this -> _PIE['vin_nr']."'";
 			$vin_array = parent::get_sql_array_result($check_vin_sql);
 			if(count($vin_array) == 0)
 			{
-				$check_owner_nr_sql = "SELECT owner_id FROM owner_data WHERE owner_number = '{$_SESSION['owner_data']['owner_number']}' LIMIT 1" ;
+				$check_owner_nr_sql = "SELECT owner_id FROM owner_data WHERE owner_number = '".$this -> _PIE['owner_number']."' LIMIT 1" ;
 				$owner_id_array = parent::get_sql_array_result($check_owner_nr_sql);
 				if(count($owner_id_array) == 0)
 				{
 					$insert_owner_sql = "INSERT INTO owner_data(owner_name, owner_surname, owner_number) 
-										VALUES('{$_SESSION['owner_data']['owner_name']}', 
-										'{$_SESSION['owner_data']['owner_surname']}', 
-										'{$_SESSION['owner_data']['owner_number']}')";
+										VALUES('{$this -> _PIE['owner_name']}', 
+										'{$this -> _PIE['owner_surname']}', 
+										'{$this -> _PIE['owner_number']}')";
 					$createNewOwner = parent::requestResult($insert_owner_sql);
 					$owner_id_array = parent::get_sql_array_result($check_owner_nr_sql);
 					if(!$createNewOwner)
@@ -68,11 +68,11 @@ class Model_Data_Processing extends Model{
 				$owner_id = $owner_id_array[0]['owner_id'];
 				
 				$insert_new_auto_sql = "INSERT INTO auto_data(vin_nr, reg_nr, manufact_year, brand_name, model_name, owner_id)
-				VALUES ('{$_SESSION['auto_data']['vin_nr']}', 
-						'{$_SESSION['auto_data']['reg_nr']}', 
-						'{$_SESSION['auto_data']['manufact_year']}', 
-						'{$_SESSION['auto_data']['brand_name']}', 
-						'{$_SESSION['auto_data']['model_name']}', 
+				VALUES ('{$this -> _PIE['vin_nr']}', 
+						'{$this -> _PIE['reg_nr']}', 
+						'{$this -> _PIE['manufact_year']}', 
+						'{$this -> _PIE['brand_name']}', 
+						'{$this -> _PIE['model_name']}', 
 						'{$owner_id}')";
 					
 				$insertNewAuto = parent::requestResult($insert_new_auto_sql);
@@ -127,8 +127,10 @@ class Model_Data_Processing extends Model{
 			return 'Auto by your search filter model not exists.';
 		}
 		else
-		{
-			$_SESSION['filter_data']['filter_query'] = $auto_data_sql;
+		{	
+			$pie_array['filter_query'] = $auto_data_sql;
+			$this -> filter_query = $auto_data_sql;
+			Pie::set_pie(PIE_PATH, $pie_array, "a");
 			return 'The result of your request is below. To continue the search try again.';
 		}
 	}
@@ -187,8 +189,7 @@ class Model_Data_Processing extends Model{
 		else
 		{
 			return 'What do you want to delete? Fill at least one field.';
-		}
-		
+		}	
 	}
 	
 	private function get_owner_data_sql(){
@@ -200,21 +201,22 @@ class Model_Data_Processing extends Model{
 		}
 		return $owner_data_sql;
 	}
-	
+
 	private function get_auto_data_array(){
 		$auto_data_array = array();
-			foreach($_SESSION['auto_data'] as $key=>$value)
-			{
-				if(!empty($_SESSION['auto_data'][$key])){$auto_data_array[$key] = $value;}
-			}
+		if(isset($this -> _PIE['vin_nr']))$auto_data_array['vin_nr'] = $this -> _PIE['vin_nr'];
+		if(isset($this -> _PIE['reg_nr']))$auto_data_array['reg_nr'] = $this -> _PIE['reg_nr'];
+		if(isset($this -> _PIE['manufact_year']))$auto_data_array['manufact_year'] = $this -> _PIE['manufact_year'];
+		if(isset($this -> _PIE['brand_name']))$auto_data_array['brand_name'] = $this -> _PIE['brand_name'];
+		if(isset($this -> _PIE['model_name']))$auto_data_array['model_name'] = $this -> _PIE['model_name'];
 		return $auto_data_array;
 	}
 	
 	private function get_owner_data_array(){
 		$owner_data_array = array();
-			foreach($_SESSION['owner_data'] as $key=>$value){
-				if(!empty($_SESSION['owner_data'][$key])){$owner_data_array[$key] = $value;}
-			}
+		if(isset($this -> _PIE['owner_name']))$owner_data_array['owner_name'] = $this -> _PIE['owner_name'];
+		if(isset($this -> _PIE['owner_surname']))$owner_data_array['owner_surname'] = $this -> _PIE['owner_surname'];
+		if(isset($this -> _PIE['owner_number']))$owner_data_array['owner_number'] = $this -> _PIE['owner_number'];
 		return 	$owner_data_array;
 	}
 	

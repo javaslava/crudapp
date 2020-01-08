@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Код страницы 404</title>
+<title>Page code 404</title>
 <link rel="stylesheet" type="text/css" href="/css/error_page_style.css" />
 
 </head>

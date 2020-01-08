@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Dec 06, 2019 at 02:08 PM
+-- Generation Time: Jan 08, 2020 at 01:54 PM
 -- Server version: 10.3.13-MariaDB-log
 -- PHP Version: 7.1.32
 
@@ -54,7 +54,6 @@ INSERT INTO `auto_data` (`auto_id`, `vin_nr`, `reg_nr`, `manufact_year`, `brand_
 (53, 'TOYOTA1TZ8WO456QU', 'RK7755', 2013, 'TOYOTA', 'RAV4', 40),
 (54, 'TOYOTA1TZ8CO456QU', 'RK7133', 2005, 'TOYOTA', 'COROLLA', 40),
 (55, 'LAMB1TZ8CO456QU', 'AB45', 2015, 'LAMBORGINI', '7777', 41),
-(56, 'FER1TZ8CO456QU', 'AB4545', 2015, 'FERRARI', 'DIABLO', 41),
 (57, 'BUG1TZ8CO987QU', 'AB1111', 2016, 'BUGATTI', 'VERON', 41),
 (58, 'ZAZ1TZ8CO987QU', 'AB666', 1965, 'ZAZ', 'ZHUK965', 41),
 (59, 'MAZ1TZ8CO111VA', 'VA1111', 1985, 'MAZ', 'HYBRYD', 42),
@@ -84,7 +83,13 @@ INSERT INTO `auto_data` (`auto_id`, `vin_nr`, `reg_nr`, `manufact_year`, `brand_
 (83, 'VOL83EN73VA11100', 'SL4851', 2007, 'VOLVO', 'V70', 46),
 (84, 'AU83EN73VA111AU', 'SL4852', 2000, 'AUDI', 'A6', 46),
 (85, 'AU83EN73VA222AU', 'SL4852', 2016, 'AUDI', 'A7', 46),
-(86, 'BM83EN73VA333AU', 'SL4852', 2016, 'BMW', 'HYBRYD', 46);
+(86, 'BM83EN73VA333AU', 'SL4852', 2016, 'BMW', 'HYBRYD', 46),
+(90, 'WVZZZZ8CO666V95674', 'VT0456', 2003, 'VW', 'TOUREG', 43),
+(91, 'PORZZZ1TZ8WO23800', 'KB2011', 2018, 'PORSCHE', 'CAYENNE', 50),
+(92, 'VIN345RASDF342HFBBBBAUDI', 'OL1111', 2019, 'AUDI', 'TT', 51),
+(93, 'VIN0987654321QWERTYVW', 'OL1212', 2018, 'VW', 'TOUREG', 51),
+(95, 'WVZZZZ8CO777VA012', 'OP2345', 2018, 'NISSAN', 'MICRA', 52),
+(97, 'TOYOTA1TZ8WO23SDA', 'AV2309', 2016, 'TOYOTA', 'AYGO', 54);
 
 -- --------------------------------------------------------
 
@@ -128,10 +133,10 @@ CREATE TABLE `logo_slides` (
 INSERT INTO `logo_slides` (`id`, `pict_src`, `pict_width`, `pict_height`, `text`, `visible`) VALUES
 (1, 'images/logo_slides/slide1.jpg', 704, 528, 'Коротко обо мне.\r\nЗвать меня Вячеслав. Мне 41 год. Женат уж как 15 лет. Две дочки наполняют жизнь разнообразием. ', 1),
 (2, 'images/logo_slides/slide2.jpg', 704, 528, 'По профессии - столяр-мебельщик. С 1994 года по 2012 год целиком посвятил себя ремеслу. Большая часть моего творчества - проектирование, расчет и изготовление лестниц.', 1),
-(3, 'images/logo_slides/slide3.jpg', 704, 528, 'Разработал собственную методику проектирования лестниц на основе тригонометрии, что позволило реализовать более 300 проектов. ', 1),
-(4, 'images/logo_slides/slide4.jpg', 704, 528, 'Однако, с 2013 года сменил индивидуальное производство на массовое. 5 лет работал оператором CNC машины. Работа тесно связана с програмным кодом, но не столь интересна как работа с WEB.', 1),
-(5, 'images/logo_slides/slide5.jpg', 704, 528, 'В то же время с нуля самостоятельно прогрызал HTML, CSS, PHP, MySQL. И вот это оказалось весьма увлекательным. В 2018 - 2019 прошел курсы по Java и базам данных в учебном центре Java_Guru.   ', 1),
-(6, 'images/logo_slides/slide6.jpg', 704, 528, 'В настоящее время готов продолжать обучаться в выбранном направлении. Хотелось бы свои теоретические знания развивать на практике на основе реальных проектов. Что и является моей целью.', 1);
+(3, 'images/logo_slides/slide3.jpg', 704, 528, 'Однако, с 2013 года сменил индивидуальное производство на массовое. 5 лет работал оператором CNC машины. Работа тесно связана с програмным кодом, но не столь интересна как работа с WEB.', 1),
+(4, 'images/logo_slides/slide14.jpg', 704, 528, 'В то же время с нуля самостоятельно прогрызал HTML, CSS, PHP, MySQL. И вот это оказалось весьма увлекательным. В 2018 - 2019 прошел курсы по Java и базам данных в учебном центре Java_Guru.', 1),
+(5, 'images/logo_slides/slide15.jpg', 704, 528, 'В настоящее время готов продолжать обучаться в выбранном направлении. Хотелось бы свои теоретические знания развивать на практике на основе реальных проектов. Что и является моей целью.   ', 1),
+(6, 'images/logo_slides/slide6.jpg', 704, 528, 'Для связи со мной:<br><br>\r\nТелефон: 22846841 <br><br>\r\nE-mail: bohanv@gmail.com', 1);
 
 -- --------------------------------------------------------
 
@@ -159,7 +164,11 @@ INSERT INTO `owner_data` (`owner_id`, `owner_name`, `owner_surname`, `owner_numb
 (44, 'OLGA', 'SERGEEVA', '22077911861'),
 (45, 'NATALY', 'IVANOVA', '06050511835'),
 (46, 'SERGIO', 'LEVITS', '22127611888'),
-(49, 'PETR', 'ANITKO', '23046911956');
+(49, 'PETR', 'ANITKO', '23046911956'),
+(50, 'KRISTINE', 'BOHANE', '20117911855'),
+(51, 'OLGA', 'IVANOVA', '01017811851'),
+(52, 'OLEG', 'PETROV', '13038211831'),
+(54, 'ALISE', 'VASILJEVA', '13077911845');
 
 -- --------------------------------------------------------
 
@@ -183,7 +192,11 @@ INSERT INTO `users_data` (`user_id`, `user_name`, `user_email`, `user_password`)
 (26, 'Petr', 'petr@gmail.com', 'STORM'),
 (31, 'Serg', 'serg@gmail.com', 'SERGIO'),
 (32, 'Вячеслав', 'bohan@gmail.com', '1234'),
-(33, 'Anatoliy', 'tolik@gmail.com', '1234');
+(33, 'Anatoliy', 'tolik@gmail.com', '1234'),
+(34, 'Olga', 'olga@gmail.com', 'OLGA'),
+(35, 'Kristina', 'kr@gmail.com', 'KR'),
+(36, 'Nikolay', 'nik@gmail.com', 'NIK'),
+(37, 'Kate', 'kate@gmail.com', 'KATE');
 
 --
 -- Indexes for dumped tables
@@ -228,7 +241,7 @@ ALTER TABLE `users_data`
 -- AUTO_INCREMENT for table `auto_data`
 --
 ALTER TABLE `auto_data`
-  MODIFY `auto_id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `auto_id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=98;
 
 --
 -- AUTO_INCREMENT for table `config`
@@ -246,13 +259,13 @@ ALTER TABLE `logo_slides`
 -- AUTO_INCREMENT for table `owner_data`
 --
 ALTER TABLE `owner_data`
-  MODIFY `owner_id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `owner_id` int(9) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `users_data`
 --
 ALTER TABLE `users_data`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- Constraints for dumped tables

@@ -1,59 +1,86 @@
 <?php
-session_unset();
 // Задаем константы:
 define ('DS', DIRECTORY_SEPARATOR); 
 $sitePath = realpath(dirname(__FILE__));
 define ('SITE_PATH', $sitePath); 
 define ('REQUEST_URI', $_SERVER['REQUEST_URI']);
 define ('APP_DIR', 'application');
-define ('RECORDS_PER_PAGE', 20);
+define ('RECORDS_PER_PAGE', 10);
+define ('PIE_DIR', 'tmp/');
+define ('PIE_PATH', PIE_DIR.session_id().".txt");
+define ('PIE_EXP_TIME', 60*60*24*2);
+define ('PIE_UNLINK_TIMER', PIE_EXP_TIME/2);
 
 // для подключения к бд
-define('DB_USER', 'slava');
-define('DB_PASS', 'fstorm');
+define('DB_USER', '');
+define('DB_PASS', '');
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'crud_app');
 
-$_SESSION['user']['loginout'] = isset($_POST['loginout']) && !empty($_POST['loginout']) ? $_POST['loginout'] : null;
-$_SESSION['user']['userID'] = isset($_POST['userID']) ? $_POST['userID'] : null;
-$_SESSION['user']['userName'] = isset($_POST['userName']) ? $_POST['userName'] : null;
+if(file_exists(PIE_PATH) && filemtime(PIE_PATH) < time() - PIE_UNLINK_TIMER){	
+Pie::launch_expired_pies();
+}
 
-$_SESSION['filter_data']['filter_query'] = isset($_POST['filter_query']) ? $_POST['filter_query'] : null;
-$_SESSION['order_factor'] = isset($_POST['order_factor']) ? $_POST['order_factor'] : 1;
-$_SESSION['page_number'] = isset($_POST['page_number']) ? $_POST['page_number'] : 1;
+$_PIE = Pie::get_pie_assoc_array(PIE_PATH);
+$pie_array = array();
 
-$_SESSION['order_by'] = isset($_POST['order_by']) ? $_POST['order_by'] : null;
-$order_direction = $_SESSION['order_factor'] < 0 ? ' ASC' : ' DESC';
-$_SESSION['order_rule'] = !empty($_SESSION['order_by']) ? $_SESSION['order_by'].$order_direction : null;
-
-$reg_userName= isset($_POST['reg_userName']) ? $_POST['reg_userName'] : null;
-$reg_email= isset($_POST['reg_email']) ? $_POST['reg_email'] : null;
-$reg_password= isset($_POST['reg_password']) ? $_POST['reg_password'] : null;
-$confirm_pass= isset($_POST['confirm_pass']) ? $_POST['confirm_pass'] : null;
-$log_email= isset($_POST['log_email']) ? $_POST['log_email'] : null;
-$log_password= isset($_POST['log_password']) ? $_POST['log_password'] : null;
-
-$auto_data = ['vin_nr' => isset($_POST['vin_nr']) && !isset($_POST['reset']) ? $_POST['vin_nr'] : null,
-					'reg_nr' => isset($_POST['reg_nr']) && !isset($_POST['reset']) ? $_POST['reg_nr'] : null,
-					'manufact_year' => isset($_POST['manufact_year']) && !isset($_POST['reset']) ? $_POST['manufact_year'] : null,
-					'brand_name' => isset($_POST['brand_name']) && !isset($_POST['reset']) ? $_POST['brand_name'] : null,
-					'model_name' => isset($_POST['model_name']) && !isset($_POST['reset']) ? $_POST['model_name'] : null
-				];
-$owner_data = ['owner_name' => isset($_POST['owner_name']) && !isset($_POST['reset']) ? $_POST['owner_name'] : null,
-					'owner_surname' => isset($_POST['owner_surname']) && !isset($_POST['reset']) ? $_POST['owner_surname'] : null,
-					'owner_number' => isset($_POST['owner_number']) && !isset($_POST['reset']) ? $_POST['owner_number'] : null
-				];
-	foreach($auto_data as $key=>$value){
-		$_SESSION['auto_data'][$key] = !empty($value) ? Syntax::syntaxToUpper($value) : null;		
-	}
-	foreach($owner_data as $key=>$value){
-		$_SESSION['owner_data'][$key] = !empty($value) ? Syntax::syntaxToUpper($value) : null;		
-	}
+$user_data = array('reg_userName', 'reg_email', 'reg_password', 'confirm_pass', 'log_email', 'log_password');
+foreach($user_data as $data){
+	$user_data[$data] = isset($_POST[$data]) ? $_POST[$data] : null;
+}
 
 $db_conn = new ConnectionDB();
-$analyzer = new Model_LogRegAnalyzer($db_conn, $reg_userName, $reg_email, $reg_password, $confirm_pass, $log_email, $log_password);
+$analyzer = new Model_LogRegAnalyzer($db_conn, $user_data);
 
-$_SESSION['login_message'] = isset($_POST['data_submit']) && $_POST['data_submit']=='Send' ? $analyzer -> get_message() : 'Enter data for all fields.';
+$logStatus = isset($_POST['loginout']) ? $_POST['loginout'] : (isset($_PIE['logStatus']) ? $_PIE['logStatus'] : "");
+
+$login_message = !empty($logStatus) && isset($_POST['data_submit']) && $_POST['data_submit']=='Send' ? $analyzer -> get_message() : 
+				(!empty($logStatus) && isset($_PIE['login_message']) ? $_PIE['login_message'] : 'Enter data for all fields.');
+
+$userID = empty($login_message) && !empty($logStatus) && isset($_POST['data_submit']) && $_POST['data_submit']=='Send' ? $analyzer -> get_userID() : 
+		(empty($logStatus) ? "" : (isset($_PIE['userID']) ? $_PIE['userID'] : ""));
+		
+$userName = empty($login_message) && !empty($logStatus) && isset($_POST['data_submit']) && $_POST['data_submit']=='Send' ? $analyzer -> get_userName() : 
+		(empty($logStatus) ? "" : (isset($_PIE['userName']) ? $_PIE['userName'] : ""));
+
+$page_number = isset($_POST['page_number']) ? $_POST['page_number'] : (!isset($_POST['reset']) && isset($_PIE['page_number']) && !isset($_POST['data_submit']) ? $_PIE['page_number'] : 1);
+$limit_rule = " LIMIT ".($page_number - 1) * RECORDS_PER_PAGE.", ".RECORDS_PER_PAGE;
+$order_factor = isset($_POST['order_factor']) ? $_POST['order_factor'] : 1;
+$order_direction = $order_factor > 0 ? ' ASC' : ' DESC';
+$order_by = isset($_POST['order_by']) ? $_POST['order_by'] : "";
+$order_rule = !empty($order_by) ? $order_by.$order_direction : "";
+			
+$process_data = array('vin_nr', 'reg_nr', 'manufact_year', 'brand_name', 'model_name', 'owner_name', 'owner_surname', 'owner_number');
+foreach($process_data as $value){
+	$$value = isset($_POST[$value]) && !isset($_POST['reset']) ? Syntax::syntaxToUpper($_POST[$value]) : (isset($_PIE[$value]) && !isset($_POST['reset']) ? $_PIE[$value] : "");
+}
+	if(!empty($logStatus) && !isset($_POST['cancel'])) $pie_array['logStatus'] = $logStatus;
+	$pie_array['login_message'] = $login_message;
+	if(!empty($userID)) $pie_array['userID'] = $userID;
+	if(!empty($userName)) $pie_array['userName'] = $userName;
+	$pie_array['order_factor'] = $order_factor;
+	$pie_array['limit_rule'] = $limit_rule;
+	$pie_array['order_rule'] = $order_rule;
+	if(isset($_PIE['userID']) && !isset($_POST['loginout'])){
+		foreach($process_data as $value){
+			if(!empty($$value)) $pie_array[$value] = $$value;
+		}
+		$pie_array['page_number'] = $page_number;
+		if(isset($_PIE['filter_query']) && !isset($_POST['reset'])) $pie_array['filter_query'] = $_PIE['filter_query'];
+	}
+Pie::set_pie(PIE_PATH, $pie_array, "w");
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
